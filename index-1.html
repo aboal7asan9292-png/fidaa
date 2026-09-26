@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="مفكرة شخصية لإدارة الملاحظات والمصاريف والميزانية والديون">
+  <title>مفكرتي ومصاريفي</title>
+  <style>
+    :root{
+      --bg:#f4f2ec;--surface:#faf8f2;--card:#fffdf8;--text:#17211f;--muted:#6f7774;
+      --primary:#0f766e;--primary-dark:#0a5f59;--accent:#d7ebe7;--border:#ddd9cf;
+      --danger:#b53b3b;--warning:#a7681d;--success:#167c5a;
+      --shadow:0 12px 30px rgba(31,43,40,.08);--radius:18px
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:Tahoma,Arial,sans-serif;color:var(--text);
+      background:radial-gradient(circle at top right,rgba(15,118,110,.08),transparent 30rem),var(--bg)
+    }
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:1180px;margin:auto;padding:18px}
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;gap:18px;
+      background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;
+      padding:20px 22px;border-radius:22px;box-shadow:var(--shadow)
+    }
+    .brand h1{font-size:23px;margin:0 0 6px}.brand p{margin:0;opacity:.84;font-size:12px}
+    .topside{display:flex;align-items:center;gap:10px}.clock{font-size:12px;opacity:.9;white-space:nowrap}
+    .lock-now{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:10px;padding:8px 10px}
+    .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}
+    .tab{border:1px solid var(--border);background:rgba(255,253,248,.95);border-radius:13px;padding:11px 12px;font-weight:700;color:var(--text)}
+    .tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .page{display:none}.page.active{display:block}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .summary.three{grid-template-columns:repeat(3,1fr)}
+    .card,.stat{
+      background:rgba(255,253,248,.95);border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:var(--shadow)
+    }
+    .card{padding:18px}.stat{padding:16px}
+    .stat span,.stat small{display:block;color:var(--muted);font-size:11px}
+    .stat b{display:block;color:var(--primary);font-size:23px;margin:6px 0 2px}
+    h2{font-size:18px;margin:0 0 4px}.hint{font-size:12px;color:var(--muted);margin:0 0 16px}
+    label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:11px 0 6px}
+    input,textarea,select{
+      width:100%;border:1px solid var(--border);border-radius:11px;padding:11px 12px;
+      background:#fff;outline:none;color:var(--text)
+    }
+    input:focus,textarea:focus,select:focus{border-color:#64aaa3;box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+    textarea{min-height:170px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .btn{border:0;border-radius:11px;padding:10px 13px;font-weight:700}
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.secondary{background:#e7efed;color:#185a55}
+    .btn.ghost{background:#eeece6;color:#39413e}
+    .btn.danger{background:#f7e2e2;color:#9f2f2f}
+    .toolbar{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px}
+    .list{max-height:540px;overflow:auto}
+    .item{
+      border:1px solid var(--border);border-radius:14px;background:var(--surface);
+      padding:13px;margin-bottom:9px
+    }
+    .item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .item h3{font-size:14px;margin:0}.meta{color:var(--muted);font-size:10px;margin-top:4px}
+    .note-body{white-space:pre-wrap;line-height:1.75;font-size:13px;margin:10px 0 0}
+    .mini-actions{display:flex;gap:6px}
+    .mini{width:32px;height:32px;border:0;border-radius:9px;background:#ebe9e3;color:#5e6663}
+    .mini:hover{background:var(--accent);color:#155e59}.mini.del:hover{background:#f7e2e2;color:var(--danger)}
+    .amount{font-weight:800;color:var(--warning);text-align:left;white-space:nowrap}
+    .pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+    .pill{font-size:10px;background:#eae8e1;color:#656c69;border-radius:999px;padding:4px 8px}
+    .empty{text-align:center;color:var(--muted);padding:30px 8px;font-size:12px}
+    .budget-grid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+    .budget-boxes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 10px}
+    .budget-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px}
+    .budget-box span,.budget-box b{display:block}.budget-box span{font-size:10px;color:var(--muted);margin-bottom:4px}
+    .progress{height:10px;border-radius:999px;background:#e8e5de;overflow:hidden}
+    .progress>div{height:100%;background:linear-gradient(90deg,var(--primary),#2f9c90);width:0;transition:.2s}
+    .progress-caption{font-size:10px;color:var(--muted);margin-top:6px}
+    .chart{display:grid;gap:9px;margin-top:12px}
+    .chart-row{display:grid;grid-template-columns:80px 1fr 85px;gap:8px;align-items:center;font-size:11px}
+    .chart-track{height:12px;background:#e9e6df;border-radius:999px;overflow:hidden}
+    .chart-bar{height:100%;background:var(--primary);border-radius:999px}
+    .health{display:grid;gap:8px}.health div{display:flex;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:10px 11px;font-size:12px}
+    .debt-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:flex-start}
+    .status-btn{width:32px;height:32px;border:0;border-radius:9px;background:transparent;color:var(--primary);font-size:19px}
+    .paid{opacity:.58}.paid h3,.paid .amount{text-decoration:line-through}
+    .info{margin-top:14px;background:#e7efed;color:#185a55;border-radius:11px;padding:10px 12px;font-size:11px;line-height:1.7}
+    .hidden{display:none}
+    .footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px;padding:22px 4px 8px}
+    .footer b{color:var(--primary)}
+    .lock-screen{
+      min-height:100vh;display:none;place-items:center;padding:20px;
+      background:radial-gradient(circle at top right,rgba(15,118,110,.1),transparent 30rem),var(--bg)
+    }
+    .lock-screen.active{display:grid}.app.locked{display:none}
+    .lock-card{width:min(100%,390px);background:var(--card);border:1px solid var(--border);border-radius:22px;padding:26px;box-shadow:var(--shadow);text-align:center}
+    .lock-card h1{font-size:22px;margin:0 0 8px}.lock-card p{color:var(--muted);font-size:12px;line-height:1.7}
+    .lock-card .btn{width:100%;margin-top:10px}.lock-card small{display:block;color:var(--muted);margin-top:14px}
+    .error{color:var(--danger);font-size:11px;margin-top:8px}
+    @media(max-width:900px){.summary{grid-template-columns:1fr 1fr}.dashboard-grid{grid-template-columns:1fr}}
+    @media(max-width:760px){
+      .app{padding:12px}.topbar{padding:17px}.clock{display:none}.tabs{display:flex;overflow:auto}.tab{min-width:110px}
+      .grid,.summary,.summary.three,.row,.toolbar,.budget-boxes{grid-template-columns:1fr}
+      .footer{flex-direction:column;text-align:center}.brand h1{font-size:20px}.topbar{align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+
+<section id="lockScreen" class="lock-screen">
+  <div class="lock-card">
+    <h1>🔒 مفكرتي ومصاريفي</h1>
+    <p>أدخل رمز القفل للوصول إلى بياناتك على هذا الجهاز.</p>
+    <input id="unlockPin" type="password" inputmode="numeric" placeholder="رمز القفل">
+    <div id="lockError" class="error"></div>
+    <button class="btn primary" id="unlockBtn">فتح التطبيق</button>
+    <small>Designed by abo alhasan</small>
+  </div>
+</section>
+
+<div id="app" class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1>مفكرتي ومصاريفي</h1>
+      <p>ملاحظاتك، ميزانيتك، مصاريفك وديونك في مكان واحد</p>
+    </div>
+    <div class="topside">
+      <div class="clock" id="clock"></div>
+      <button id="lockNow" class="lock-now hidden">🔒 قفل</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-page="dashboard">📊 الرئيسية</button>
+    <button class="tab" data-page="notes">📝 المفكرة</button>
+    <button class="tab" data-page="expenses">💰 المصاريف</button>
+    <button class="tab" data-page="debts">🤝 الديون</button>
+    <button class="tab" data-page="settings">⚙️ الإعدادات</button>
+  </nav>
+
+  <section id="dashboard" class="page active">
+    <div class="summary">
+      <div class="stat"><span>مصروف اليوم</span><b id="dashToday">0.00</b><small>ريال سعودي</small></div>
+      <div class="stat"><span>مصروف الشهر</span><b id="dashMonth">0.00</b><small>ريال سعودي</small></div>
+      <div class="stat"><span>ديون لك</span><b id="dashDebtToMe">0.00</b><small>غير مسددة</small></div>
+      <div class="stat"><span>ديون عليك</span><b id="dashDebtOnMe">0.00</b><small>غير مسددة</small></div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="card">
+        <h2>الميزانية الشهرية</h2>
+        <p class="hint">حدد سقفاً للمصاريف وراقب تقدمك خلال الشهر.</p>
+        <label>ميزانية هذا الشهر</label>
+        <div class="budget-grid">
+          <input id="monthlyBudget" type="number" min="0" step="1" placeholder="مثال: 5000">
+          <b>ر.س</b>
+        </div>
+        <div class="budget-boxes">
+          <div class="budget-box"><span>المستخدم</span><b id="budgetUsed">0.00 ر.س</b></div>
+          <div class="budget-box"><span>المتبقي</span><b id="budgetRemaining">0.00 ر.س</b></div>
+        </div>
+        <div class="progress"><div id="budgetProgress"></div></div>
+        <div class="progress-caption" id="budgetCaption">أدخل ميزانية شهرية لتفعيل المتابعة</div>
+      </div>
+
+      <div class="card">
+        <h2>المصاريف حسب التصنيف</h2>
+        <p class="hint">توزيع مصاريف الشهر الحالي.</p>
+        <div id="categoryChart" class="chart"></div>
+      </div>
+
+      <div class="card">
+        <h2>أقرب الديون</h2>
+        <p class="hint">الالتزامات غير المسددة مرتبة حسب الموعد.</p>
+        <div id="upcomingDebts"></div>
+        <div class="actions"><button class="btn secondary" data-go="debts">فتح قسم الديون</button></div>
+      </div>
+
+      <div class="card">
+        <h2>حالة البيانات</h2>
+        <p class="hint">ملخص سريع للبيانات المحفوظة على هذا الجهاز.</p>
+        <div class="health">
+          <div><span>الملاحظات</span><b id="healthNotes">0</b></div>
+          <div><span>المصاريف</span><b id="healthExpenses">0</b></div>
+          <div><span>الديون</span><b id="healthDebts">0</b></div>
+          <div><span>القفل</span><b id="healthLock">غير مفعّل</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="notes" class="page">
+    <div class="grid">
+      <div class="card">
+        <h2 id="noteFormTitle">ملاحظة جديدة</h2>
+        <p class="hint">اكتب الفكرة الآن حتى لا تنساها لاحقاً.</p>
+        <input id="noteId" type="hidden">
+        <label>العنوان</label>
+        <input id="noteTitle" placeholder="مثال: أفكار اليوم">
+        <label>الملاحظة</label>
+        <textarea id="noteBody" placeholder="اكتب ملاحظتك هنا..."></textarea>
+        <div class="actions">
+          <button class="btn primary" id="saveNote">حفظ الملاحظة</button>
+          <button class="btn ghost hidden" id="cancelNote">إلغاء</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>ملاحظاتي</h2>
+        <p class="hint"><span id="notesCount">0</span> ملاحظة محفوظة على هذا الجهاز.</p>
+        <input id="noteSearch" placeholder="بحث في الملاحظات...">
+        <div id="notesList" class="list" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="expenses" class="page">
+    <div class="summary three">
+      <div class="stat"><span>مصروف اليوم</span><b id="todayTotal">0.00</b><small>ريال سعودي</small></div>
+      <div class="stat"><span>هذا الشهر</span><b id="monthTotal">0.00</b><small>ريال سعودي</small></div>
+      <div class="stat"><span>العمليات</span><b id="expenseCount">0</b><small>عملية مسجلة</small></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2 id="expenseFormTitle">إضافة مصروف</h2>
+        <p class="hint">سجل العملية فوراً لتحصل على مجموع دقيق.</p>
+        <input id="expenseId" type="hidden">
+        <div class="row">
+          <div><label>المبلغ</label><input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+          <div><label>التاريخ</label><input id="expenseDate" type="date"></div>
+        </div>
+        <label>التصنيف</label>
+        <select id="expenseCategory"></select>
+        <label>الوصف</label>
+        <input id="expenseDesc" placeholder="مثال: غداء، بنزين، فاتورة...">
+        <div class="actions">
+          <button class="btn primary" id="saveExpense">حفظ المصروف</button>
+          <button class="btn ghost hidden" id="cancelExpense">إلغاء</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>سجل المصاريف</h2>
+        <p class="hint">راجع عملياتك أو فلترها حسب الشهر والتصنيف.</p>
+        <div class="toolbar">
+          <select id="filterCategory"></select>
+          <input id="filterMonth" type="month">
+          <button class="btn secondary" id="exportExpenses">تصدير CSV</button>
+        </div>
+        <div id="expensesList" class="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="debts" class="page">
+    <div class="summary three">
+      <div class="stat"><span>مبالغ لك</span><b id="debtToMe">0.00</b><small>ريال سعودي</small></div>
+      <div class="stat"><span>مبالغ عليك</span><b id="debtOnMe">0.00</b><small>ريال سعودي</small></div>
+      <div class="stat"><span>غير المسدد</span><b id="unpaidDebtCount">0</b><small>سجل</small></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2 id="debtFormTitle">إضافة دين</h2>
+        <p class="hint">سجل المبالغ لك أو عليك وتابع حالة السداد.</p>
+        <input id="debtId" type="hidden">
+        <label>اسم الشخص</label>
+        <input id="debtPerson" placeholder="الاسم">
+        <div class="row">
+          <div><label>المبلغ</label><input id="debtAmount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+          <div>
+            <label>نوع الدين</label>
+            <select id="debtDirection"><option value="لي">لي عنده</option><option value="علي">علي له</option></select>
+          </div>
+        </div>
+        <label>موعد السداد</label>
+        <input id="debtDueDate" type="date">
+        <label>ملاحظة</label>
+        <input id="debtNote" placeholder="سبب الدين أو أي تفاصيل...">
+        <div class="actions">
+          <button class="btn primary" id="saveDebt">حفظ الدين</button>
+          <button class="btn ghost hidden" id="cancelDebt">إلغاء</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>سجل الديون</h2>
+        <p class="hint">اضغط على حالة السداد لتغييرها.</p>
+        <div id="debtsList" class="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="settings" class="page">
+    <div class="grid">
+      <div class="card">
+        <h2>النسخ الاحتياطي</h2>
+        <p class="hint">احفظ نسخة من الملاحظات والمصاريف والديون والميزانية.</p>
+        <div class="actions">
+          <button class="btn primary" id="exportBackup">تنزيل نسخة احتياطية</button>
+          <button class="btn secondary" id="importBackupBtn">استعادة نسخة</button>
+          <input id="backupFile" class="hidden" type="file" accept=".json,application/json">
+        </div>
+        <div class="info">احتفظ بالملف في مكان آمن. الاستعادة تستبدل البيانات الموجودة على هذا الجهاز.</div>
+      </div>
+
+      <div class="card">
+        <h2>قفل التطبيق</h2>
+        <p class="hint" id="pinStatus">أضف رمزاً لحماية الوصول المحلي.</p>
+        <div id="currentPinWrap" class="hidden">
+          <label>الرمز الحالي</label>
+          <input id="currentPin" type="password" inputmode="numeric" placeholder="الرمز الحالي">
+        </div>
+        <label>الرمز الجديد</label>
+        <input id="newPin" type="password" inputmode="numeric" placeholder="4 خانات أو أكثر">
+        <div id="pinMessage" class="error"></div>
+        <div class="actions">
+          <button class="btn primary" id="savePin">تفعيل القفل</button>
+          <button class="btn danger hidden" id="removePin">إلغاء القفل</button>
+        </div>
+        <div class="info">القفل حماية محلية على هذا الجهاز، وليس تشفيراً كاملاً للبيانات.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>بياناتك محفوظة محلياً داخل متصفحك.</span>
+    <b>Designed by abo alhasan</b>
+  </footer>
+</div>
+
+<script>
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+
+  const KEYS = {
+    notes: "mofakkirati_notes_v2",
+    expenses: "mofakkirati_expenses_v2",
+    debts: "mofakkirati_debts_v1",
+    budget: "mofakkirati_budget_v1",
+    pin: "mofakkirati_pin_hash_v1",
+    session: "mofakkirati_session_unlocked_v1"
+  };
+
+  const categories = ["طعام","مواصلات","تسوق","فواتير","عمل","ترفيه","أخرى"];
+  const safeParse = (value, fallback) => { try { return value ? JSON.parse(value) : fallback; } catch { return fallback; } };
+
+  let notes = safeParse(localStorage.getItem(KEYS.notes), []);
+  let expenses = safeParse(localStorage.getItem(KEYS.expenses), []);
+  let debts = safeParse(localStorage.getItem(KEYS.debts), []);
+  let monthlyBudget = Number(localStorage.getItem(KEYS.budget) || 0);
+  let pinHash = localStorage.getItem(KEYS.pin) || "";
+
+  function todayISO(){
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  }
+
+  function id(){
+    return crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2);
+  }
+
+  function money(value){
+    return Number(value || 0).toLocaleString("ar-SA",{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+
+  function esc(value=""){
+    return String(value).replace(/[&<>"']/g,(m)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+  }
+
+  function saveAll(){
+    localStorage.setItem(KEYS.notes, JSON.stringify(notes));
+    localStorage.setItem(KEYS.expenses, JSON.stringify(expenses));
+    localStorage.setItem(KEYS.debts, JSON.stringify(debts));
+    localStorage.setItem(KEYS.budget, String(monthlyBudget));
+  }
+
+  function go(page){
+    $$(".tab,.page").forEach((el)=>el.classList.remove("active"));
+    $('.tab[data-page="'+page+'"]').classList.add("active");
+    $("#"+page).classList.add("active");
+    if(page === "dashboard") renderDashboard();
+  }
+
+  $$(".tab").forEach((btn)=>btn.addEventListener("click",()=>go(btn.dataset.page)));
+  $$("[data-go]").forEach((btn)=>btn.addEventListener("click",()=>go(btn.dataset.go)));
+
+  function renderNotes(){
+    const q = $("#noteSearch").value.trim().toLowerCase();
+    const list = [...notes]
+      .filter((note)=>!q || (note.title+" "+note.body).toLowerCase().includes(q))
+      .sort((a,b)=>(b.updatedAt || b.updated || 0)-(a.updatedAt || a.updated || 0));
+
+    $("#notesCount").textContent = notes.length.toLocaleString("ar-SA");
+    $("#notesList").innerHTML = list.length ? list.map((note)=>`
+      <article class="item">
+        <div class="item-head">
+          <div>
+            <h3>${esc(note.title || "بدون عنوان")}</h3>
+            <div class="meta">${new Date(note.updatedAt || note.updated || Date.now()).toLocaleString("ar-SA")}</div>
+          </div>
+          <div class="mini-actions">
+            <button class="mini" onclick="editNote('${note.id}')">✏️</button>
+            <button class="mini del" onclick="deleteNote('${note.id}')">🗑️</button>
+          </div>
+        </div>
+        ${note.body ? `<p class="note-body">${esc(note.body)}</p>` : ""}
+      </article>
+    `).join("") : '<div class="empty">لا توجد ملاحظات مطابقة.</div>';
+  }
+
+  function resetNote(){
+    $("#noteId").value=""; $("#noteTitle").value=""; $("#noteBody").value="";
+    $("#noteFormTitle").textContent="ملاحظة جديدة";
+    $("#saveNote").textContent="حفظ الملاحظة";
+    $("#cancelNote").classList.add("hidden");
+  }
+
+  $("#saveNote").onclick = ()=>{
+    const title=$("#noteTitle").value.trim(), body=$("#noteBody").value.trim(), noteId=$("#noteId").value;
+    if(!title && !body) return;
+
+    if(noteId){
+      const note=notes.find((item)=>item.id===noteId);
+      if(note) Object.assign(note,{title,body,updatedAt:Date.now()});
+    }else{
+      notes.push({id:id(),title,body,updatedAt:Date.now()});
+    }
+    saveAll(); resetNote(); renderAll();
+  };
+
+  $("#cancelNote").onclick=resetNote;
+  $("#noteSearch").oninput=renderNotes;
+
+  window.editNote=(noteId)=>{
+    const note=notes.find((item)=>item.id===noteId); if(!note) return;
+    $("#noteId").value=note.id; $("#noteTitle").value=note.title || ""; $("#noteBody").value=note.body || "";
+    $("#noteFormTitle").textContent="تعديل الملاحظة"; $("#saveNote").textContent="حفظ التعديل";
+    $("#cancelNote").classList.remove("hidden"); scrollTo({top:0,behavior:"smooth"});
+  };
+
+  window.deleteNote=(noteId)=>{
+    if(confirm("حذف هذه الملاحظة؟")){
+      notes=notes.filter((item)=>item.id!==noteId); saveAll(); renderAll();
+    }
+  };
+
+  $("#expenseCategory").innerHTML = categories.map((c)=>`<option>${c}</option>`).join("");
+  $("#filterCategory").innerHTML = '<option value="">كل التصنيفات</option>' + categories.map((c)=>`<option>${c}</option>`).join("");
+  $("#expenseDate").value=todayISO();
+
+  function renderExpenses(){
+    const category=$("#filterCategory").value, month=$("#filterMonth").value;
+    const list=[...expenses]
+      .filter((item)=>!category || item.category===category)
+      .filter((item)=>!month || item.date.startsWith(month))
+      .sort((a,b)=>b.date.localeCompare(a.date)||(b.createdAt||b.created||0)-(a.createdAt||a.created||0));
+
+    $("#expensesList").innerHTML = list.length ? list.map((item)=>`
+      <article class="item">
+        <div class="item-head">
+          <div>
+            <h3>${esc(item.description || item.desc || item.category)}</h3>
+            <div class="pills"><span class="pill">${esc(item.category)}</span><span class="pill">${esc(item.date)}</span></div>
+          </div>
+          <div>
+            <div class="amount">${money(item.amount)} ر.س</div>
+            <div class="mini-actions" style="margin-top:7px">
+              <button class="mini" onclick="editExpense('${item.id}')">✏️</button>
+              <button class="mini del" onclick="deleteExpense('${item.id}')">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    `).join("") : '<div class="empty">لا توجد مصاريف مطابقة.</div>';
+  }
+
+  function resetExpense(){
+    $("#expenseId").value=""; $("#expenseAmount").value=""; $("#expenseDate").value=todayISO();
+    $("#expenseCategory").value="طعام"; $("#expenseDesc").value="";
+    $("#expenseFormTitle").textContent="إضافة مصروف"; $("#saveExpense").textContent="حفظ المصروف";
+    $("#cancelExpense").classList.add("hidden");
+  }
+
+  $("#saveExpense").onclick=()=>{
+    const amount=Number($("#expenseAmount").value), date=$("#expenseDate").value;
+    const category=$("#expenseCategory").value, description=$("#expenseDesc").value.trim(), expenseId=$("#expenseId").value;
+    if(!(amount>0) || !date) return;
+
+    if(expenseId){
+      const item=expenses.find((entry)=>entry.id===expenseId);
+      if(item) Object.assign(item,{amount,date,category,description,desc:description});
+    }else{
+      expenses.push({id:id(),amount,date,category,description,desc:description,createdAt:Date.now()});
+    }
+    saveAll(); resetExpense(); renderAll();
+  };
+
+  $("#cancelExpense").onclick=resetExpense;
+  $("#filterCategory").onchange=renderExpenses;
+  $("#filterMonth").onchange=renderExpenses;
+
+  window.editExpense=(expenseId)=>{
+    const item=expenses.find((entry)=>entry.id===expenseId); if(!item) return;
+    $("#expenseId").value=item.id; $("#expenseAmount").value=item.amount; $("#expenseDate").value=item.date;
+    $("#expenseCategory").value=item.category; $("#expenseDesc").value=item.description || item.desc || "";
+    $("#expenseFormTitle").textContent="تعديل المصروف"; $("#saveExpense").textContent="حفظ التعديل";
+    $("#cancelExpense").classList.remove("hidden"); scrollTo({top:0,behavior:"smooth"});
+  };
+
+  window.deleteExpense=(expenseId)=>{
+    if(confirm("حذف هذا المصروف؟")){
+      expenses=expenses.filter((entry)=>entry.id!==expenseId); saveAll(); renderAll();
+    }
+  };
+
+  $("#exportExpenses").onclick=()=>{
+    if(!expenses.length) return alert("لا توجد مصاريف لتصديرها.");
+    const rows=[["التاريخ","التصنيف","الوصف","المبلغ"],...expenses.map((e)=>[e.date,e.category,e.description||e.desc||"",e.amount])];
+    const csv="\uFEFF"+rows.map((row)=>row.map((value)=>'"'+String(value??"").replaceAll('"','""')+'"').join(",")).join("\n");
+    downloadBlob("مصاريفي.csv",csv,"text/csv;charset=utf-8");
+  };
+
+  function resetDebt(){
+    $("#debtId").value=""; $("#debtPerson").value=""; $("#debtAmount").value="";
+    $("#debtDirection").value="لي"; $("#debtDueDate").value=""; $("#debtNote").value="";
+    $("#debtFormTitle").textContent="إضافة دين"; $("#saveDebt").textContent="حفظ الدين";
+    $("#cancelDebt").classList.add("hidden");
+  }
+
+  $("#saveDebt").onclick=()=>{
+    const person=$("#debtPerson").value.trim(), amount=Number($("#debtAmount").value);
+    const direction=$("#debtDirection").value, dueDate=$("#debtDueDate").value, note=$("#debtNote").value.trim(), debtId=$("#debtId").value;
+    if(!person || !(amount>0)) return;
+
+    if(debtId){
+      const item=debts.find((entry)=>entry.id===debtId);
+      if(item) Object.assign(item,{person,amount,direction,dueDate,note});
+    }else{
+      debts.push({id:id(),person,amount,direction,dueDate,note,paid:false,createdAt:Date.now()});
+    }
+    saveAll(); resetDebt(); renderAll();
+  };
+
+  $("#cancelDebt").onclick=resetDebt;
+
+  function renderDebts(){
+    const list=[...debts].sort((a,b)=>Number(a.paid)-Number(b.paid)+(b.createdAt-a.createdAt));
+    $("#debtsList").innerHTML=list.length ? list.map((item)=>`
+      <article class="item debt-item ${item.paid?"paid":""}">
+        <button class="status-btn" onclick="toggleDebt('${item.id}')">${item.paid?"✅":"◯"}</button>
+        <div>
+          <h3>${esc(item.person)}</h3>
+          <div class="pills">
+            <span class="pill">${item.direction==="لي"?"لي عنده":"علي له"}</span>
+            ${item.dueDate?`<span class="pill">${esc(item.dueDate)}</span>`:""}
+            <span class="pill">${item.paid?"مسدد":"غير مسدد"}</span>
+          </div>
+          ${item.note?`<div class="meta" style="margin-top:8px">${esc(item.note)}</div>`:""}
+        </div>
+        <div>
+          <div class="amount">${money(item.amount)} ر.س</div>
+          <div class="mini-actions" style="margin-top:7px">
+            <button class="mini" onclick="editDebt('${item.id}')">✏️</button>
+            <button class="mini del" onclick="deleteDebt('${item.id}')">🗑️</button>
+          </div>
+        </div>
+      </article>
+    `).join("") : '<div class="empty">لا توجد ديون مسجلة.</div>';
+
+    const unpaid=debts.filter((item)=>!item.paid);
+    const toMe=unpaid.filter((item)=>item.direction==="لي").reduce((s,item)=>s+Number(item.amount),0);
+    const onMe=unpaid.filter((item)=>item.direction==="علي").reduce((s,item)=>s+Number(item.amount),0);
+    $("#debtToMe").textContent=money(toMe); $("#debtOnMe").textContent=money(onMe);
+    $("#unpaidDebtCount").textContent=unpaid.length.toLocaleString("ar-SA");
+  }
+
+  window.toggleDebt=(debtId)=>{
+    const item=debts.find((entry)=>entry.id===debtId); if(!item) return;
+    item.paid=!item.paid; saveAll(); renderAll();
+  };
+
+  window.editDebt=(debtId)=>{
+    const item=debts.find((entry)=>entry.id===debtId); if(!item) return;
+    $("#debtId").value=item.id; $("#debtPerson").value=item.person; $("#debtAmount").value=item.amount;
+    $("#debtDirection").value=item.direction; $("#debtDueDate").value=item.dueDate||""; $("#debtNote").value=item.note||"";
+    $("#debtFormTitle").textContent="تعديل الدين"; $("#saveDebt").textContent="حفظ التعديل";
+    $("#cancelDebt").classList.remove("hidden"); scrollTo({top:0,behavior:"smooth"});
+  };
+
+  window.deleteDebt=(debtId)=>{
+    if(confirm("حذف هذا الدين؟")){
+      debts=debts.filter((entry)=>entry.id!==debtId); saveAll(); renderAll();
+    }
+  };
+
+  $("#monthlyBudget").value=monthlyBudget || "";
+  $("#monthlyBudget").oninput=()=>{
+    monthlyBudget=Math.max(0,Number($("#monthlyBudget").value)||0);
+    localStorage.setItem(KEYS.budget,String(monthlyBudget));
+    renderDashboard();
+  };
+
+  function renderDashboard(){
+    const today=todayISO(), month=today.slice(0,7);
+    const monthExpenses=expenses.filter((item)=>item.date.startsWith(month));
+    const todayTotal=expenses.filter((item)=>item.date===today).reduce((s,item)=>s+Number(item.amount),0);
+    const monthTotal=monthExpenses.reduce((s,item)=>s+Number(item.amount),0);
+    const unpaid=debts.filter((item)=>!item.paid);
+    const toMe=unpaid.filter((item)=>item.direction==="لي").reduce((s,item)=>s+Number(item.amount),0);
+    const onMe=unpaid.filter((item)=>item.direction==="علي").reduce((s,item)=>s+Number(item.amount),0);
+
+    $("#dashToday").textContent=money(todayTotal); $("#todayTotal").textContent=money(todayTotal);
+    $("#dashMonth").textContent=money(monthTotal); $("#monthTotal").textContent=money(monthTotal);
+    $("#dashDebtToMe").textContent=money(toMe); $("#dashDebtOnMe").textContent=money(onMe);
+    $("#expenseCount").textContent=expenses.length.toLocaleString("ar-SA");
+
+    const remaining=monthlyBudget ? monthlyBudget-monthTotal : 0;
+    const percent=monthlyBudget ? Math.min(100,Math.round(monthTotal/monthlyBudget*100)) : 0;
+    $("#budgetUsed").textContent=money(monthTotal)+" ر.س";
+    $("#budgetRemaining").textContent=money(remaining)+" ر.س";
+    $("#budgetRemaining").style.color=remaining<0?"var(--danger)":"";
+    $("#budgetProgress").style.width=percent+"%";
+    $("#budgetCaption").textContent=monthlyBudget ? percent+"% من الميزانية" : "أدخل ميزانية شهرية لتفعيل المتابعة";
+
+    const grouped=categories.map((category)=>({
+      category,
+      total:monthExpenses.filter((item)=>item.category===category).reduce((s,item)=>s+Number(item.amount),0)
+    })).filter((item)=>item.total>0);
+    const max=Math.max(1,...grouped.map((item)=>item.total));
+
+    $("#categoryChart").innerHTML=grouped.length ? grouped.map((item)=>`
+      <div class="chart-row">
+        <span>${esc(item.category)}</span>
+        <div class="chart-track"><div class="chart-bar" style="width:${Math.round(item.total/max*100)}%"></div></div>
+        <b>${money(item.total)}</b>
+      </div>
+    `).join("") : '<div class="empty">أضف مصاريف هذا الشهر ليظهر الرسم.</div>';
+
+    const upcoming=[...unpaid].sort((a,b)=>(a.dueDate||"9999").localeCompare(b.dueDate||"9999")).slice(0,5);
+    $("#upcomingDebts").innerHTML=upcoming.length ? upcoming.map((item)=>`
+      <div class="item">
+        <div class="item-head">
+          <div><h3>${esc(item.person)}</h3><div class="meta">${item.direction==="لي"?"لي عنده":"علي له"}${item.dueDate?" · "+esc(item.dueDate):""}</div></div>
+          <div class="amount">${money(item.amount)} ر.س</div>
+        </div>
+      </div>
+    `).join("") : '<div class="empty">لا توجد ديون غير مسددة.</div>';
+
+    $("#healthNotes").textContent=notes.length.toLocaleString("ar-SA");
+    $("#healthExpenses").textContent=expenses.length.toLocaleString("ar-SA");
+    $("#healthDebts").textContent=debts.length.toLocaleString("ar-SA");
+    $("#healthLock").textContent=pinHash?"مفعّل":"غير مفعّل";
+  }
+
+  function downloadBlob(filename,content,type){
+    const url=URL.createObjectURL(new Blob([content],{type}));
+    const link=document.createElement("a"); link.href=url; link.download=filename; link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  $("#exportBackup").onclick=()=>{
+    const payload={version:1,exportedAt:new Date().toISOString(),notes,expenses,debts,monthlyBudget};
+    downloadBlob("mofakkirati-backup-"+todayISO()+".json",JSON.stringify(payload,null,2),"application/json;charset=utf-8");
+  };
+
+  $("#importBackupBtn").onclick=()=>$("#backupFile").click();
+  $("#backupFile").onchange=async(event)=>{
+    const file=event.target.files?.[0]; if(!file) return;
+    try{
+      const data=JSON.parse(await file.text());
+      if(!data || !Array.isArray(data.notes) || !Array.isArray(data.expenses)) throw new Error();
+      if(!confirm("سيتم استبدال البيانات الحالية. هل تريد المتابعة؟")) return;
+      notes=data.notes; expenses=data.expenses; debts=Array.isArray(data.debts)?data.debts:[]; monthlyBudget=Number(data.monthlyBudget)||0;
+      $("#monthlyBudget").value=monthlyBudget||""; saveAll(); renderAll(); alert("تمت استعادة النسخة الاحتياطية.");
+    }catch{ alert("تعذر قراءة ملف النسخة الاحتياطية."); }
+    event.target.value="";
+  };
+
+  async function hash(value){
+    const data=new TextEncoder().encode(value);
+    const digest=await crypto.subtle.digest("SHA-256",data);
+    return [...new Uint8Array(digest)].map((b)=>b.toString(16).padStart(2,"0")).join("");
+  }
+
+  function updatePinUi(){
+    $("#pinStatus").textContent=pinHash?"القفل مفعّل حالياً.":"أضف رمزاً لحماية الوصول المحلي.";
+    $("#currentPinWrap").classList.toggle("hidden",!pinHash);
+    $("#removePin").classList.toggle("hidden",!pinHash);
+    $("#savePin").textContent=pinHash?"تغيير الرمز":"تفعيل القفل";
+    $("#lockNow").classList.toggle("hidden",!pinHash);
+  }
+
+  $("#savePin").onclick=async()=>{
+    $("#pinMessage").textContent="";
+    const next=$("#newPin").value, current=$("#currentPin").value;
+    if(next.length<4) return $("#pinMessage").textContent="الرمز الجديد يجب أن يكون 4 خانات على الأقل.";
+    if(pinHash && await hash(current)!==pinHash) return $("#pinMessage").textContent="الرمز الحالي غير صحيح.";
+    pinHash=await hash(next); localStorage.setItem(KEYS.pin,pinHash); sessionStorage.setItem(KEYS.session,"yes");
+    $("#currentPin").value=""; $("#newPin").value=""; $("#pinMessage").textContent="تم حفظ رمز القفل."; updatePinUi(); renderDashboard();
+  };
+
+  $("#removePin").onclick=async()=>{
+    $("#pinMessage").textContent="";
+    if(await hash($("#currentPin").value)!==pinHash) return $("#pinMessage").textContent="الرمز الحالي غير صحيح.";
+    pinHash=""; localStorage.removeItem(KEYS.pin); sessionStorage.removeItem(KEYS.session);
+    $("#currentPin").value=""; $("#newPin").value=""; $("#pinMessage").textContent="تم إلغاء القفل."; updatePinUi(); renderDashboard();
+  };
+
+  function showLock(){
+    if(!pinHash) return;
+    sessionStorage.removeItem(KEYS.session);
+    $("#app").classList.add("locked"); $("#lockScreen").classList.add("active");
+    $("#unlockPin").value=""; $("#lockError").textContent="";
+  }
+
+  function hideLock(){
+    $("#app").classList.remove("locked"); $("#lockScreen").classList.remove("active");
+  }
+
+  $("#lockNow").onclick=showLock;
+  $("#unlockBtn").onclick=async()=>{
+    if(await hash($("#unlockPin").value)===pinHash){
+      sessionStorage.setItem(KEYS.session,"yes"); hideLock();
+    }else $("#lockError").textContent="الرمز غير صحيح.";
+  };
+  $("#unlockPin").onkeydown=(e)=>{ if(e.key==="Enter") $("#unlockBtn").click(); };
+
+  function renderAll(){
+    renderNotes(); renderExpenses(); renderDebts(); renderDashboard(); updatePinUi();
+  }
+
+  function tick(){
+    $("#clock").textContent=new Date().toLocaleString("ar-SA",{dateStyle:"full",timeStyle:"short"});
+  }
+
+  tick(); setInterval(tick,30000);
+  renderAll();
+
+  if(pinHash && sessionStorage.getItem(KEYS.session)!=="yes") showLock();
+</script>
+</body>
+</html>
